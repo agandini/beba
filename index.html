@@ -182,6 +182,17 @@ button {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+} 
+button:focus {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#noBtn {
+  /* Assicuriamoci che non ci siano transizioni troppo lente 
+     che mantengono il bottone sotto il dito */
+  transition: transform 0.1s ease-out; 
+  user-select: none; /* Evita che Marta selezioni il testo del bottone per sbaglio */
 }
 </style>
 </head>
@@ -197,8 +208,8 @@ button {
 </div>
 
 <div class="letter" id="letter">
-  <h1 style="color: #ff1493;">Marta 💖</h1>
-  <p class="ink hidden-text">Ho analizzato migliaia di righe di codice...</p> <p class="ink hidden-text">Ma non ho trovato nessun algoritmo che spiegasse quanto sei speciale.</p> <h2 class="ink hidden-text">Beba, vuoi fare un upgrade al mio cuore? 💘</h2>
+  <h1 style="color: #ff1493;">Beba 💖</h1>
+  <p class="ink hidden-text">Ho analizzato migliaia di righe di codice...</p> <p class="ink hidden-text">Ma non ho trovato nessun algoritmo che spiegasse quanto sei speciale.</p> <h2 class="ink hidden-text">Marta, vuoi fare un upgrade al mio cuore? 💘</h2>
   
   <div class="buttons" id="btnContainer">
     <button id="yesBtn">SÌ 💕</button>
@@ -222,12 +233,21 @@ let noCounter = 0;
 
 wrapper.addEventListener("click", () => {
   wrapper.classList.add("open");
-  music.play().catch(() => console.log("Audio richiede interazione"));
+  music.play().catch(() => {});
   
+  // Rendiamo la lettera "non cliccabile" finché non è aperta del tutto
+  letter.style.pointerEvents = "none"; 
+
   setTimeout(() => {
     wrapper.style.display = "none";
     letter.style.display = "block";
     startTyping();
+    
+    // Riattiviamo i click solo dopo che l'animazione è finita (es. 1 secondo)
+    setTimeout(() => {
+      letter.style.pointerEvents = "auto";
+    }, 1000); 
+
   }, 800);
   
   startHearts();
@@ -292,7 +312,18 @@ function moveNo() {
   // Piccola vibrazione (se da mobile) per simulare l'errore
   if (navigator.vibrate) navigator.vibrate(50);
 }
- 
+ let isMoving = false;
+
+noBtn.addEventListener("click", (e) => {
+  e.preventDefault(); // Impedisce comportamenti strani del browser
+  if (isMoving) return;
+  
+  isMoving = true;
+  moveNo();
+  
+  // Impedisce un nuovo click per 300ms, il tempo di scappare!
+  setTimeout(() => { isMoving = false; }, 300);
+});
 
 yesBtn.addEventListener("click", () => {
   // 1. Nascondi tutto il contenuto della lettera (titolo, testi, bottoni)
@@ -352,4 +383,3 @@ function heartRain() {
 </script>
 </body>
 </html>
-
