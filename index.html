@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💘 Marta, ho una domanda 💘</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Comic Sans MS', cursive;
+  }
+
+  /* ✉️ BUSTA DA LETTERA */
+  .envelope-wrapper {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.4s;
+  }
+
+  .envelope {
+    width: 340px;
+    height: 220px;
+    background: #ff69b4;
+    position: relative;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .envelope::before {
+    content: "💌 Clicca per aprire";
+    color: white;
+    font-size: 18px;
+	margin-top: 70px;
+  }
+
+  /* Lembo superiore */
+  .envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 170px solid transparent;
+    border-right: 170px solid transparent;
+    border-top: 130px solid #ff85c1; /* Triangolo verso il basso */
+    transform-origin: top;
+    transition: transform 0.6s ease;
+    z-index: 3;
+  }
+
+  .envelope-wrapper.open .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 0; /* Va dietro quando si apre */
+  }
+
+  .envelope-wrapper:hover {
+    transform: scale(1.05);
+  }
+
+  /* === LETTERA === */
+  .letter {
+    width: 320px;
+    background: #fffafc;
+    border-radius: 6px;
+    padding: 30px;
+    text-align: center;
+    display: none;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    animation: peekOut 0.8s ease forwards;
+  }
+
+  @keyframes peekOut {
+    from { transform: translate(-50%, 0%) scale(0.5); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+
+  .ink {
+    font-family: 'Segoe Script', cursive;
+    font-size: 18px;
+    color: #444;
+    margin-bottom: 15px;
+  }
+
+  .hidden-text { visibility: hidden; }
+
+  /* BOTTONI */
+  .buttons {
+  display: flex;
+  justify-content: center; /* Centra orizzontalmente */
+  gap: 20px;               /* Spazio tra SÌ e NO */
+  margin-top: 30px;
+  position: relative;      /* Necessario per il movimento del NO */
+  min-height: 60px;        /* Evita che la lettera si restringa quando il tasto scappa */
+}
+
+button {
+  padding: 12px 25px;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+  border-radius: 25px;
+  font-family: 'Comic Sans MS', cursive;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+#yesBtn {
+  background-color: #ff1493;
+  color: white;
+  z-index: 2; /* Rimane sopra */
+}
+
+#noBtn {
+  background-color: #f0f0f0;
+  color: #666;
+  position: relative; /* Cambia in 'absolute' solo quando inizia a scappare */
+  z-index: 1;
+}
+  /* DECORAZIONI */
+  .heart { position: absolute; animation: floatUp 5s linear infinite; }
+  @keyframes floatUp {
+    from { transform: translateY(100vh); opacity: 1; }
+    to { transform: translateY(-10vh); opacity: 0; }
+  }
+
+  #result { display: none; margin-top: 20px; font-weight: bold; color: #ff1493; }
+  .final-photo { width: 100%; border-radius: 10px; margin-top: 10px; }
+
+  /* CELEBRATION */
+  .celebration {
+    position: absolute;
+    font-size: 30px;
+    animation: boom 1.2s ease-out forwards;
+    z-index: 100;
+  }
+  @keyframes boom {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: translate(var(--x), var(--y)) scale(1.5); opacity: 0; }
+  }
+  
+  #result {
+  display: none; /* Inizialmente nascosto */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 1s ease-in;
+}
+
+.final-photo {
+  max-width: 100%;
+  border-radius: 15px;
+  border: 5px solid #ff1493;
+  margin-top: 15px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<audio id="music" loop>
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<div class="envelope-wrapper" id="envelopeWrapper">
+  <div class="envelope-flap"></div>
+  <div class="envelope"></div>
+</div>
+
+<div class="letter" id="letter">
+  <h1 style="color: #ff1493;">Beba 💖</h1>
+  <p class="ink hidden-text">Ho fatto dei calcoli scientifici...</p>
+  <p class="ink hidden-text">Ho chiesto a JavaScript...</p>
+  <h2 class="ink hidden-text">Will you be my Valentine? 💘</h2>
+  
+  <div class="buttons" id="btnContainer">
+    <button id="yesBtn">SÌ 💕</button>
+    <button id="noBtn">NO 😶</button>
+  </div>
+
+  <div id="result">
+    <p>Lo sapevo! you are the best! 🥰</p>
+    <img src="foto.jpeg" class="final-photo" alt="Noi 💕">
+  </div>
+</div>
+
+<script>
+const wrapper = document.getElementById("envelopeWrapper");
+const letter = document.getElementById("letter");
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const music = document.getElementById("music");
+
+let noCounter = 0;
+
+wrapper.addEventListener("click", () => {
+  wrapper.classList.add("open");
+  music.play().catch(() => console.log("Audio richiede interazione"));
+  
+  setTimeout(() => {
+    wrapper.style.display = "none";
+    letter.style.display = "block";
+    startTyping();
+  }, 800);
+  
+  startHearts();
+});
+
+function startTyping() {
+  const elements = document.querySelectorAll(".ink");
+  elements.forEach((el, i) => {
+    setTimeout(() => {
+      typeEffect(el);
+    }, i * 1500);
+  });
+}
+
+function typeEffect(element) {
+  const text = element.textContent;
+  element.textContent = "";
+  element.classList.remove("hidden-text");
+  let i = 0;
+  const timer = setInterval(() => {
+    element.textContent += text.charAt(i);
+    i++;
+    if (i >= text.length) clearInterval(timer);
+  }, 50);
+}
+
+// Logica pulsante NO
+noBtn.addEventListener("mouseover", moveNo);
+noBtn.onclick = moveNo;
+// Logica pulsante NO - DISPETTOSO
+noBtn.addEventListener("mouseover", moveNo);
+noBtn.onclick = moveNo;
+
+function moveNo() {
+  noCounter++;
+
+  // Al primo movimento, lo rendiamo absolute per non influenzare il tasto SI
+  if (noBtn.style.position !== 'absolute') {
+    noBtn.style.position = 'absolute';
+  }
+
+  const range = 150; // Raggio del movimento
+  
+  // Calcolo spostamento
+  const randomX = (Math.random() * 2 - 1) * range;
+  const randomY = (Math.random() * 2 - 1) * range;
+  const randomRotate = (Math.random() * 30) - 15;
+
+  noBtn.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRotate}deg)`;
+
+  // Testi simpatici
+  const phrases = ["No! 😋", "Mancato!", "Riprova!", "Ops!", "Mai! 🏃‍♀️"];
+  noBtn.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+yesBtn.addEventListener("click", () => {
+  // 1. Nascondi tutto il contenuto della lettera (titolo, testi, bottoni)
+  const letterContent = letter.querySelectorAll("h1, .ink, .buttons");
+  letterContent.forEach(el => el.style.display = "none");
+
+  // 2. Mostra il risultato finale
+  result.style.display = "flex";
+  result.style.flexDirection = "column";
+
+  // 3. Effetti speciali
+  celebration();
+  heartRain(); // Pioggia di cuori continua
+  
+  // Bonus: Cambia lo sfondo della pagina per renderlo più festoso
+  document.body.style.background = "radial-gradient(circle, #ffb6c1, #ff69b4)";
+  
+  vibrate([200, 100, 200]);
+});
+
+function startHearts() {
+  setInterval(() => {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.innerHTML = "💖";
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = (Math.random() * 20 + 10) + "px";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 5000);
+  }, 400);
+}
+
+function celebration() {
+  for(let i=0; i<30; i++) {
+    const c = document.createElement("div");
+    c.className = "celebration";
+    c.innerHTML = "🌸";
+    c.style.left = "50%";
+    c.style.top = "50%";
+    c.style.setProperty('--x', (Math.random()*400 - 200) + "px");
+    c.style.setProperty('--y', (Math.random()*400 - 200) + "px");
+    document.body.appendChild(c);
+  }
+}
+function heartRain() {
+  setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.textContent = "💖";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = Math.random() * 20 + 20 + "px";
+    heart.style.zIndex = "1000";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
+  }, 150); // Più veloce e intensa!
+}
+</script>
+</body>
+</html>
