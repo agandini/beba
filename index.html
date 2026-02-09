@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💘 Marta, ho una domanda 💘</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Indie+Flower&display=swap" rel="stylesheet">
 <style>
   body {
     margin: 0;
@@ -89,12 +92,19 @@
     to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
 
-  .ink {
-    font-family: 'Segoe Script', cursive;
-    font-size: 18px;
-    color: #444;
-    margin-bottom: 15px;
-  }
+  /* Per il titolo "Marta" e le frasi principali */
+h1, h2 {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 600;
+}
+
+/* Per il testo che viene "scritto" (l'effetto inchiostro) */
+.ink {
+  font-family: 'Indie Flower', cursive;
+  font-size: 20px; /* Su iPhone il testo corsivo piccolo si legge male, meglio alzarlo */
+  line-height: 1.6;
+  color: #444;
+}
 
   .hidden-text { visibility: hidden; }
 
@@ -188,9 +198,7 @@ button {
 
 <div class="letter" id="letter">
   <h1 style="color: #ff1493;">Beba 💖</h1>
- <p class="ink hidden-text">Ho analizzato migliaia di righe di codice...</p> 
-<p class="ink hidden-text">Ma non ho trovato nessun algoritmo che spiegasse quanto sei speciale.</p>
-<h2 class="ink hidden-text">Marta, vuoi fare un upgrade al mio cuore? 💘</h2>
+  <p class="ink hidden-text">Ho analizzato migliaia di righe di codice...</p> <p class="ink hidden-text">Ma non ho trovato nessun algoritmo che spiegasse quanto sei speciale.</p> <h2 class="ink hidden-text">Marta, vuoi fare un upgrade al mio cuore? 💘</h2>
   
   <div class="buttons" id="btnContainer">
     <button id="yesBtn">SÌ 💕</button>
@@ -246,34 +254,45 @@ function typeEffect(element) {
   }, 50);
 }
 
-// Logica pulsante NO
-noBtn.addEventListener("mouseover", moveNo);
-noBtn.onclick = moveNo;
-// Logica pulsante NO - DISPETTOSO
-noBtn.addEventListener("mouseover", moveNo);
-noBtn.onclick = moveNo;
+// Rimuoviamo l'evento mouseover. Ora reagisce SOLO al click.
+noBtn.addEventListener("click", moveNo);
 
 function moveNo() {
   noCounter++;
 
-  // Al primo movimento, lo rendiamo absolute per non influenzare il tasto SI
+  // Al primo click, lo rendiamo absolute per farlo viaggiare nella lettera
   if (noBtn.style.position !== 'absolute') {
     noBtn.style.position = 'absolute';
   }
 
-  const range = 150; // Raggio del movimento
+  // Definiamo il raggio d'azione (rimane vicino alla busta)
+  const range = 140; 
   
-  // Calcolo spostamento
   const randomX = (Math.random() * 2 - 1) * range;
   const randomY = (Math.random() * 2 - 1) * range;
-  const randomRotate = (Math.random() * 30) - 15;
+  const randomRotate = (Math.random() * 50) - 25; // Rotazione più accentuata
 
+  // Applichiamo il movimento con un effetto "molla"
+  noBtn.style.transition = "transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
   noBtn.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRotate}deg)`;
 
-  // Testi simpatici
-  const phrases = ["No! 😋", "Mancato!", "Riprova!", "Ops!", "Mai! 🏃‍♀️"];
+  // Frasi cattivelle dopo il click mancato
+  const phrases = [
+    "Troppo lenta! 😜",
+    "Riprova! 😅",
+    "Quasi... ma no.",
+    "Rimaniamo amici? 😂",
+    "Nope! ✋",
+    "Non oggi! 🏃‍♂️",
+    "Error 404 ❌","No! 😋", "Mancato!", "Riprova!", "Ops!", "Mai! 🏃‍♀️"
+  ];
+  
   noBtn.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+
+  // Piccola vibrazione (se da mobile) per simulare l'errore
+  if (navigator.vibrate) navigator.vibrate(50);
 }
+ 
 
 yesBtn.addEventListener("click", () => {
   // 1. Nascondi tutto il contenuto della lettera (titolo, testi, bottoni)
@@ -332,5 +351,4 @@ function heartRain() {
 }
 </script>
 </body>
-
 </html>
